@@ -42,18 +42,22 @@ namespace RestaurantApp.ViewModels
         public RelayCommand AdaugaCategorieCommand { get; }
         public RelayCommand ModificaCategorieCommand { get; }
         public RelayCommand StergeCategorieCommand { get; }
+        public RelayCommand RefreshCommand { get; }
 
         public EmployeeViewModel()
         {
-            ComenziActiveView = CollectionViewSource.GetDefaultView(ToateComenzile);
+            ComenziActiveView = new ListCollectionView(ToateComenzile);
+
             ComenziActiveView.Filter = (obj) => {
-                if (obj is DataRowView row) {
+                if (obj is DataRowView row)
+                {
                     string stare = row["Stare"].ToString().ToLower();
                     return stare != "livrata" && stare != "anulata";
                 }
                 return false;
             };
 
+            RefreshCommand = new RelayCommand(obj => IncarcaDate());
             IncarcaDate();
             ActualizeazaStareCommand = new RelayCommand(ExecuteActualizeazaStare);
             AdaugaCategorieCommand = new RelayCommand(ExecuteAdaugaCategorie);
@@ -130,26 +134,28 @@ namespace RestaurantApp.ViewModels
         {
             if (parameter is DataRowView row)
             {
-                // Inainte de actualizare, verificam daca starea veche (din baza de date) era finalizata
-                // Pentru simplitate, verificam ce scrie in randul curent, dar blocam logica daca e cazul.
-                
                 try
                 {
                     using (SqlConnection conn = new SqlConnection(_connString))
                     {
                         conn.Open();
-                        using (SqlCommand cmd = new SqlCommand("UPDATE Comenzi SET Stare = @Stare WHERE Id = @Id", conn))
+                        using (SqlCommand cmd = new SqlCommand("sp_UpdateStareComanda", conn))
                         {
-                            cmd.Parameters.AddWithValue("@Stare", row["Stare"]);
-                            cmd.Parameters.AddWithValue("@Id", (int)row["Id"]);
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.AddWithValue("@ComandaId", (int)row["Id"]);
+                            cmd.Parameters.AddWithValue("@NouaStare", row["Stare"].ToString());
                             cmd.ExecuteNonQuery();
                         }
                     }
-                    IncarcaDate(); // Reincarca totul
-                    ComenziActiveView.Refresh(); // Fortam filtrarea
-                    System.Windows.MessageBox.Show("Stare actualizată!");
+
+                    IncarcaDate();
+
+                    System.Windows.MessageBox.Show("Stare actualizată cu succes! Stocurile au fost actualizate.", "Succes");
                 }
-                catch (Exception ex) { System.Windows.MessageBox.Show("Eroare: " + ex.Message); }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show("Eroare la actualizare: " + ex.Message);
+                }
             }
         }
 
@@ -181,16 +187,22 @@ namespace RestaurantApp.ViewModels
                 using (SqlConnection conn = new SqlConnection(_connString))
                 {
                     conn.Open();
-                    using (SqlCommand cmd = new SqlCommand("UPDATE Categorii SET Denumire = @Denumire WHERE Id = @Id", conn))
+                    using (SqlCommand cmd = new SqlCommand("sp_UpdateCategorie", conn))
                     {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
                         cmd.Parameters.AddWithValue("@Denumire", NumeCategorieNoua);
                         cmd.Parameters.AddWithValue("@Id", CategorieSelectata.Id);
                         cmd.ExecuteNonQuery();
                     }
                 }
                 IncarcaDate();
+                System.Windows.MessageBox.Show("Categoria a fost modificată cu succes!", "Info");
             }
-            catch (Exception ex) { System.Windows.MessageBox.Show(ex.Message); }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("Eroare la modificare: " + ex.Message);
+            }
         }
 
         private void ExecuteStergeCategorie(object obj)
@@ -212,7 +224,6 @@ namespace RestaurantApp.ViewModels
             catch (Exception ex) { System.Windows.MessageBox.Show("Nu se poate sterge o categorie care are preparate asociate!"); }
         }
 
-        // --- Administrare Alergeni ---
         public ObservableCollection<DataRowView> Alergeni { get; set; } = new ObservableCollection<DataRowView>();
         
         private string _numeAlergenNou;

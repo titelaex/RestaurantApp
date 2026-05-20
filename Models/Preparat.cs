@@ -20,7 +20,8 @@ namespace RestaurantApp.Models
         public string ListaAlergeni { get; set; }
 
         public string TextAfisareAlergeni => string.IsNullOrEmpty(ListaAlergeni) ? "" : $"Alergeni: {ListaAlergeni}";
-        public bool EsteEpuizat => CantitateTotala <= 0; 
+        public bool EsteEpuizat => CantitateTotala <= 0;
+        public string ImaginePath { get; set; }
 
         public override string ToString()
         {

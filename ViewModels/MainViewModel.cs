@@ -159,7 +159,8 @@ namespace RestaurantApp.ViewModels
                                 CantitateTotala = (int)row["CantitateTotala"],
                                 CategorieId = (int)row["CategorieId"],
                                 CategorieDenumire = row["CategorieDenumire"].ToString(),
-                                ListaAlergeni = row["ListaAlergeni"].ToString()
+                                ListaAlergeni = row["ListaAlergeni"].ToString(),
+                                ImaginePath = row["ImaginePath"]?.ToString()
                             });
                         }
                     }
@@ -351,7 +352,8 @@ namespace RestaurantApp.ViewModels
 
         private void ExecuteVeziComenziMele(object obj)
         {
-            System.Windows.MessageBox.Show("Funcție în curs de activare. Comenzile se pot vedea în baza de date momentan.");
+            var win = new Views.ClientOrdersWindow();
+            win.Show();
         }
     }
 }
