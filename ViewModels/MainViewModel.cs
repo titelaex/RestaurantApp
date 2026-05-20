@@ -182,7 +182,8 @@ namespace RestaurantApp.ViewModels
                                 CategorieDenumire = row["CategorieDenumire"].ToString(),
                                 DetaliiPreparate = row["DetaliiPreparate"].ToString(),
                                 PretFaraReducere = (decimal)row["PretFaraReducere"],
-                                CategorieId = (int)row["CategorieId"]
+                                CategorieId = (int)row["CategorieId"],
+                                ImaginePath = row["ImaginePath"].ToString()
                             });
                         }
                     }

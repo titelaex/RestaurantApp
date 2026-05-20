@@ -123,22 +123,25 @@
                             <Border BorderBrush="#EEEEEE" BorderThickness="0,0,0,1" Padding="10">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="120" />
                                     </Grid.ColumnDefinitions>
 
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <Image Grid.Column="0" Source="{Binding ImaginePath}" Width="60" Height="60" Stretch="UniformToFill" Margin="0,0,15,0" RenderOptions.BitmapScalingMode="HighQuality"/>
+
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="{Binding Denumire}" FontWeight="Bold" FontSize="16"/>
                                         <TextBlock Text="{Binding DetaliiPreparate}" TextWrapping="Wrap" Foreground="Gray" FontSize="12"/>
                                     </StackPanel>
 
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0">
+                                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="10,0">
                                         <TextBlock Text="{Binding PretFaraReducere, StringFormat={}{0:0.00} LEI}" TextDecorations="Strikethrough" Foreground="Red" HorizontalAlignment="Right"/>
                                         <TextBlock Text="OFERTĂ!" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Right"/>
                                     </StackPanel>
 
-                                    <Button Grid.Column="2" Content="Adaugă Meniu" Command="{Binding DataContext.AdaugaMeniuInCosCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Visibility="{Binding DataContext.EsteClient, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}" Background="#4CAF50" Foreground="White"/>
+                                    <Button Grid.Column="3" Content="Adaugă Meniu" Command="{Binding DataContext.AdaugaMeniuInCosCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Visibility="{Binding DataContext.EsteClient, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}" Background="#4CAF50" Foreground="White"/>
                                 </Grid>
                             </Border>
                         </DataTemplate>

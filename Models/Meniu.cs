@@ -14,7 +14,7 @@ namespace RestaurantApp.Models
         public string DetaliiPreparate { get; set; }
         public decimal PretFaraReducere { get; set; }
         public int CategorieId { get; set; }
-
+        public string ImaginePath { get; set; }
         public decimal PretFinal(decimal discountX) => PretFaraReducere * (1 - discountX / 100);
 
         public bool EsteDisponibil { get; set; } = true; 
