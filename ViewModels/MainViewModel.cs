@@ -31,7 +31,7 @@ namespace RestaurantApp.ViewModels
         public bool EsteAngajat => SesiuneCurenta.EsteLogat && SesiuneCurenta.UtilizatorLogat.EsteAngajat;
 
         public ObservableCollection<ElementCos> CosCumparaturi { get; set; } = new ObservableCollection<ElementCos>();
-        public ObservableCollection<Meniu> CosMeniuri { get; set; } = new ObservableCollection<Meniu>(); // Simplificat pentru demo, in mod normal ar trebui ElementCosMeniu
+        public ObservableCollection<ElementCosMeniu> CosMeniuri { get; set; } = new ObservableCollection<ElementCosMeniu>();
 
         private decimal _costMancare;
         public decimal CostMancare { get => _costMancare; set { _costMancare = value; OnPropertyChanged(); } }
@@ -206,7 +206,21 @@ namespace RestaurantApp.ViewModels
         {
             if (parameter is Meniu meniu)
             {
-                CosMeniuri.Add(meniu);
+                decimal reducereMeniuX = Convert.ToDecimal(System.Configuration.ConfigurationManager.AppSettings["ReducereMeniuProcentX"] ?? "10");
+                var elementExistent = CosMeniuri.FirstOrDefault(e => e.Meniu.Id == meniu.Id);
+                if (elementExistent != null)
+                {
+                    elementExistent.Cantitate++;
+                }
+                else
+                {
+                    CosMeniuri.Add(new ElementCosMeniu 
+                    { 
+                        Meniu = meniu, 
+                        Cantitate = 1,
+                        PretUnitarAfisat = meniu.PretFinal(reducereMeniuX)
+                    });
+                }
                 RecalculeazaTotaluri();
             }
         }
@@ -222,9 +236,9 @@ namespace RestaurantApp.ViewModels
 
         private void ExecuteEliminaMeniuDinCos(object parameter)
         {
-            if (parameter is Meniu meniu)
+            if (parameter is ElementCosMeniu element)
             {
-                CosMeniuri.Remove(meniu);
+                CosMeniuri.Remove(element);
                 RecalculeazaTotaluri();
             }
         }
@@ -232,7 +246,7 @@ namespace RestaurantApp.ViewModels
         private void RecalculeazaTotaluri()
         {
             decimal reducereMeniuX = Convert.ToDecimal(System.Configuration.ConfigurationManager.AppSettings["ReducereMeniuProcentX"] ?? "10");
-            CostMancare = CosCumparaturi.Sum(e => e.Subtotal) + CosMeniuri.Sum(m => m.PretFinal(reducereMeniuX));
+            CostMancare = CosCumparaturi.Sum(e => e.Subtotal) + CosMeniuri.Sum(m => m.Subtotal);
 
             try
             {
@@ -310,8 +324,8 @@ namespace RestaurantApp.ViewModels
                             {
                                 cmd.CommandType = CommandType.StoredProcedure;
                                 cmd.Parameters.AddWithValue("@ComandaId", comandaNouaId);
-                                cmd.Parameters.AddWithValue("@MeniuId", m.Id);
-                                cmd.Parameters.AddWithValue("@NumarBucati", 1);
+                                cmd.Parameters.AddWithValue("@MeniuId", m.Meniu.Id);
+                                cmd.Parameters.AddWithValue("@NumarBucati", m.Cantitate);
                                 cmd.ExecuteNonQuery();
                             }
                         }

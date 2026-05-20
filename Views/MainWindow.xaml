@@ -178,11 +178,14 @@
                                     <Grid Margin="0,5" Width="300">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="60"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{Binding Denumire}" TextWrapping="Wrap"/>
-                                        <Button Grid.Column="2" Content=" X " Command="{Binding DataContext.EliminaMeniuDinCosCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Foreground="Red" Background="Transparent" BorderThickness="0" Margin="5,0,0,0"/>
+                                        <TextBlock Text="{Binding Meniu.Denumire}" TextWrapping="Wrap"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Cantitate, StringFormat=x{0}}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Subtotal, StringFormat={}{0:0.00}}" HorizontalAlignment="Right" Foreground="#4CAF50"/>
+                                        <Button Grid.Column="3" Content=" X " Command="{Binding DataContext.EliminaMeniuDinCosCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Foreground="Red" Background="Transparent" BorderThickness="0" Margin="5,0,0,0"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

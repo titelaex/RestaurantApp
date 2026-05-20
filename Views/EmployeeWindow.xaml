@@ -2,51 +2,198 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:viewmodels="clr-namespace:RestaurantApp.ViewModels"
-        Title="Panou Angajat" Height="600" Width="1000" WindowStartupLocation="CenterScreen">
+        xmlns:core="clr-namespace:RestaurantApp.Core"
+        Title="Panou Administrare Angajat" Height="700" Width="1100" WindowStartupLocation="CenterScreen" Background="#F5F7FA">
     
+    <Window.Resources>
+        <core:WeightConverter x:Key="WeightConverter"/>
+        
+        <!-- Style pentru Carduri -->
+        <Style x:Key="OrderCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Window.DataContext>
         <viewmodels:EmployeeViewModel />
     </Window.DataContext>
 
-    <Grid Margin="15">
-        <TabControl>
-            <TabItem Header="Toate Comenzile">
-                <DataGrid ItemsSource="{Binding ToateComenzile}" AutoGenerateColumns="False" CanUserAddRows="False">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="GESTIUNE COMENZI ȘI STOCURI" FontSize="22" FontWeight="Black" Foreground="#2C3E50" Margin="0,0,0,20" HorizontalAlignment="Center"/>
+
+        <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0">
+            <!-- TAB COMENZI ACTIVE (Card Design) -->
+            <TabItem Header="🔥 COMENZI ACTIVE">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
+                    <ItemsControl ItemsSource="{Binding ComenziActiveView}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource OrderCardStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="250"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                                <Border Background="#2196F3" CornerRadius="4" Padding="8,2" Margin="0,0,10,0">
+                                                    <TextBlock Text="{Binding CodUnic}" Foreground="White" FontWeight="Bold"/>
+                                                </Border>
+                                                <TextBlock Text="{Binding DataComanda, StringFormat={}{0:dd MMM HH:mm}}" VerticalAlignment="Center" Foreground="#7F8C8D"/>
+                                            </StackPanel>
+
+                                            <TextBlock Text="PRODUSE:" FontWeight="Bold" FontSize="11" Foreground="#95A5A6"/>
+                                            <TextBlock Text="{Binding PreparateComandate}" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,5"/>
+                                            <TextBlock Text="{Binding MeniuriComandate}" FontSize="13" Foreground="#2980B9" TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+                                            <Separator Background="#ECF0F1" Margin="0,5"/>
+                                            
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="👤 "/>
+                                                <TextBlock Text="{Binding Nume}" FontWeight="Bold"/>
+                                                <TextBlock Text="{Binding Prenume}" Margin="5,0"/>
+                                                <TextBlock Text=" | 📞 " Margin="10,0,0,0"/>
+                                                <TextBlock Text="{Binding Telefon}" Foreground="#E67E22" FontWeight="Bold"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding AdresaLivrare}" TextWrapping="Wrap" Margin="0,5,0,0" Foreground="#34495E" FontStyle="Italic"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                            <TextBlock Text="{Binding CostTotal, StringFormat={}{0:0.00} LEI}" FontSize="24" FontWeight="Black" Foreground="#27AE60" HorizontalAlignment="Right" Margin="0,0,0,15"/>
+                                            
+                                            <TextBlock Text="SCHIMBĂ STAREA:" FontSize="10" FontWeight="Bold" Margin="0,0,0,5" HorizontalAlignment="Right"/>
+                                            <ComboBox ItemsSource="{Binding DataContext.OptiuniStare, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                      SelectedItem="{Binding Stare, UpdateSourceTrigger=PropertyChanged}"
+                                                      Width="180" Height="35" VerticalContentAlignment="Center">
+                                                <ComboBox.InputBindings>
+                                                    <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.ActualizeazaStareCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
+                                                </ComboBox.InputBindings>
+                                            </ComboBox>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- TAB ISTORIC (DataGrid pentru vizualizare rapida) -->
+            <TabItem Header="📋 ISTORIC COMPLET">
+                <DataGrid ItemsSource="{Binding ToateComenzile}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,10,0,0" 
+                          Background="White" RowHeight="40" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F2F2F2">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Cod" Binding="{Binding CodUnic}" IsReadOnly="True" Width="100"/>
-                        <DataGridTextColumn Header="Data" Binding="{Binding DataComanda, StringFormat=dd.MM HH:mm}" IsReadOnly="True"/>
-                        <DataGridTemplateColumn Header="Stare" Width="150">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ComboBox ItemsSource="{Binding DataContext.OptiuniStare, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                              SelectedItem="{Binding Stare, UpdateSourceTrigger=PropertyChanged}">
-                                        <ComboBox.InputBindings>
-                                            <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.ActualizeazaStareCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
-                                        </ComboBox.InputBindings>
-                                    </ComboBox>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Client" Binding="{Binding Nume}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Telefon" Binding="{Binding Telefon}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Adresă" Binding="{Binding AdresaLivrare}" IsReadOnly="True" Width="*"/>
-                        <DataGridTextColumn Header="Total" Binding="{Binding CostTotal, StringFormat={}{0:0.00}}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Data" Binding="{Binding DataComanda, StringFormat=dd.MM HH:mm}" Width="100"/>
+                        <DataGridTextColumn Header="Cod" Binding="{Binding CodUnic}" Width="80"/>
+                        <DataGridTextColumn Header="Produse" Binding="{Binding PreparateComandate}" Width="250">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextWrapping" Value="Wrap"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Total" Binding="{Binding CostTotal, StringFormat={}{0:0.00}}" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="Client" Binding="{Binding Nume}" Width="120"/>
+                        <DataGridTextColumn Header="Stare" Binding="{Binding Stare}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Stare}" Value="livrata">
+                                            <Setter Property="Foreground" Value="Green"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Stare}" Value="anulata">
+                                            <Setter Property="Foreground" Value="Red"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
 
-            <TabItem Header="Produse Critice (Stoc mic)">
-                <ListBox ItemsSource="{Binding ProduseEpuizate}">
+            <!-- TAB STOCURI -->
+            <TabItem Header="📦 STOCURI">
+                <ListBox ItemsSource="{Binding StocComplet}" Background="Transparent" BorderThickness="0" Margin="0,10,0,0">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <TextBlock Text="{Binding Denumire}" FontWeight="Bold" Width="200"/>
-                                <TextBlock Text="Stoc curent: " Foreground="Red"/>
-                                <TextBlock Text="{Binding CantitateTotala}" FontWeight="Black" Foreground="Red"/>
-                            </StackPanel>
+                            <Border Background="White" CornerRadius="5" Margin="0,0,0,5" Padding="15">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Denumire}" FontWeight="Bold" FontSize="16" Width="300"/>
+                                        <TextBlock Text="{Binding CantitatePortie, StringFormat={}– {0}g/portie}" Foreground="Gray" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Text="{Binding CantitateTotala, Converter={StaticResource WeightConverter}}" 
+                                               FontWeight="Black" Foreground="#2196F3" FontSize="16"/>
+                                </Grid>
+                            </Border>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+            </TabItem>
+
+            <!-- TAB ADMIN -->
+            <TabItem Header="⚙️ ADMIN">
+                <TabControl TabStripPlacement="Left" Margin="0,10,0,0">
+                    <TabItem Header="Categorii">
+                        <Grid Margin="15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="300"/>
+                            </Grid.ColumnDefinitions>
+                            <ListBox ItemsSource="{Binding Categorii}" SelectedItem="{Binding CategorieSelectata}" Margin="0,0,15,0"/>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Editare Categorie" FontWeight="Bold" Margin="0,0,0,10"/>
+                                <TextBox Text="{Binding NumeCategorieNoua, UpdateSourceTrigger=PropertyChanged}" Height="30" Margin="0,0,0,10"/>
+                                <Button Content="ADĂUGĂ" Command="{Binding AdaugaCategorieCommand}" Height="30" Background="#4CAF50" Foreground="White" Margin="0,0,0,5"/>
+                                <Button Content="MODIFICĂ" Command="{Binding ModificaCategorieCommand}" Height="30" Background="#2196F3" Foreground="White" Margin="0,0,0,5"/>
+                                <Button Content="ȘTERGE" Command="{Binding StergeCategorieCommand}" Height="30" Background="#F44336" Foreground="White"/>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Alergeni">
+                        <Grid Margin="15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="300"/>
+                            </Grid.ColumnDefinitions>
+                            <ListBox ItemsSource="{Binding Alergeni}" Margin="0,0,15,0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Width="400">
+                                            <TextBlock Text="{Binding Denumire}" VerticalAlignment="Center" FontSize="14"/>
+                                            <Button Content="Elimină" HorizontalAlignment="Right" Command="{Binding DataContext.StergeAlergenCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Foreground="Red" Background="Transparent" BorderThickness="0"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Adăugare Alergen" FontWeight="Bold" Margin="0,0,0,10"/>
+                                <TextBox Text="{Binding NumeAlergenNou, UpdateSourceTrigger=PropertyChanged}" Height="30" Margin="0,0,0,10"/>
+                                <Button Content="SALVEAZĂ" Command="{Binding AdaugaAlergenCommand}" Height="30" Background="#4CAF50" Foreground="White"/>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
             </TabItem>
         </TabControl>
     </Grid>
