@@ -22,7 +22,7 @@ namespace RestaurantApp.Models
         public string TextAfisareAlergeni => string.IsNullOrEmpty(ListaAlergeni) ? "" : $"Alergeni: {ListaAlergeni}";
         public bool EsteEpuizat => CantitateTotala <= 0;
         public string ImaginePath { get; set; }
-
+        public bool EsteDisponibil { get; set; } = true;
         public override string ToString()
         {
             return $"{Denumire} - {CantitatePortie}g - {Pret} RON";

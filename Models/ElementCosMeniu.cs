@@ -20,7 +20,6 @@ namespace RestaurantApp.Models
 
         public decimal GetSubtotal(decimal discountX) => Meniu.PretFinal(discountX) * Cantitate;
         
-        // Pentru afisare simplificata fara a trimite discountX constant in binding
         public decimal PretUnitarAfisat { get; set; }
         public decimal Subtotal => PretUnitarAfisat * Cantitate;
     }

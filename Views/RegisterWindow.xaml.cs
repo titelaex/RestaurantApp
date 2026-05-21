@@ -15,18 +15,13 @@ using System.Windows.Shapes;
 namespace RestaurantApp.Views
 {
     /// <summary>
-    /// Interaction logic for LoginWindow.xaml
+    /// Interaction logic for RegisterWindow.xaml
     /// </summary>
-    public partial class LoginWindow : Window
+    public partial class RegisterWindow : Window
     {
-        public LoginWindow()
+        public RegisterWindow()
         {
             InitializeComponent();
-        }
-        private void DeschideRegister_Click(object sender, RoutedEventArgs e)
-        {
-            Views.RegisterWindow regWin = new Views.RegisterWindow();
-            regWin.ShowDialog(); 
         }
     }
 }

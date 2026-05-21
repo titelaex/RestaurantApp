@@ -122,7 +122,7 @@ namespace RestaurantApp.ViewModels
         private bool FiltrareMeniu(object obj)
         {
             if (string.IsNullOrWhiteSpace(CuvantCheie)) return true;
-            if (TipCautareSelectat == "Alergen") return ModCautareSelectat != "Conține"; // Meniurile nu au alergeni direct in DB momentan
+            if (TipCautareSelectat == "Alergen") return ModCautareSelectat != "Conține";
 
             if (obj is Meniu meniu)
             {
@@ -160,7 +160,8 @@ namespace RestaurantApp.ViewModels
                                 CategorieId = (int)row["CategorieId"],
                                 CategorieDenumire = row["CategorieDenumire"].ToString(),
                                 ListaAlergeni = row["ListaAlergeni"].ToString(),
-                                ImaginePath = row["ImaginePath"]?.ToString()
+                                ImaginePath = row["ImaginePath"]?.ToString(),
+                                EsteDisponibil = row["EsteDisponibil"] != DBNull.Value ? Convert.ToBoolean(row["EsteDisponibil"]) : true
                             });
                         }
                     }
@@ -183,7 +184,8 @@ namespace RestaurantApp.ViewModels
                                 DetaliiPreparate = row["DetaliiPreparate"].ToString(),
                                 PretFaraReducere = (decimal)row["PretFaraReducere"],
                                 CategorieId = (int)row["CategorieId"],
-                                ImaginePath = row["ImaginePath"].ToString()
+                                ImaginePath = row["ImaginePath"].ToString(),
+                                EsteDisponibil = row["EsteDisponibil"] != DBNull.Value ? Convert.ToBoolean(row["EsteDisponibil"]) : true
                             });
                         }
                     }

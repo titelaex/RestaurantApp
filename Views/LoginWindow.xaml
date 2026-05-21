@@ -29,5 +29,8 @@
                 Command="{Binding ContinuaFaraContCommand}" 
                 CommandParameter="{Binding ElementName=thisWindow}"
                 Background="Transparent" BorderThickness="0" Foreground="Blue"/>
+        <Button Content="Creează cont nou" 
+                Click="DeschideRegister_Click"
+                Background="Transparent" BorderThickness="0" Foreground="Green" Margin="0,10,0,0"/>
     </StackPanel>
 </Window>

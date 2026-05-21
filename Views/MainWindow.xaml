@@ -46,6 +46,7 @@
         </StackPanel>
 
         <TabControl Grid.Row="2" Grid.Column="0" Margin="0,0,10,0">
+
             <TabItem Header="Preparate Individuale">
                 <ListBox ItemsSource="{Binding MeniuView}" HorizontalContentAlignment="Stretch" BorderThickness="0">
                     <ListBox.GroupStyle>
@@ -88,9 +89,20 @@
                                     </StackPanel>
 
                                     <TextBlock Grid.Column="2" Text="{Binding Pret, StringFormat={}{0:0.00} LEI}" FontWeight="Bold" Foreground="#4CAF50" VerticalAlignment="Center" Margin="10,0"/>
-                                    <Button Grid.Column="3" Content="Adaugă" Command="{Binding DataContext.AdaugaInCosCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Visibility="{Binding DataContext.EsteClient, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}" Background="#2196F3" Foreground="White"/>
+
+                                    <Grid Grid.Column="3" VerticalAlignment="Center">
+                                        <Button x:Name="btnAdauga" Content="Adaugă" Command="{Binding DataContext.AdaugaInCosCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Visibility="{Binding DataContext.EsteClient, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}" Background="#2196F3" Foreground="White"/>
+                                        <TextBlock x:Name="txtIndisponibil" Text="INDISPONIBIL" Foreground="Red" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                    </Grid>
                                 </Grid>
                             </Border>
+
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding EsteDisponibil}" Value="False">
+                                    <Setter TargetName="btnAdauga" Property="Visibility" Value="Collapsed" />
+                                    <Setter TargetName="txtIndisponibil" Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -141,9 +153,19 @@
                                         <TextBlock Text="OFERTĂ!" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Right"/>
                                     </StackPanel>
 
-                                    <Button Grid.Column="3" Content="Adaugă Meniu" Command="{Binding DataContext.AdaugaMeniuInCosCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Visibility="{Binding DataContext.EsteClient, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}" Background="#4CAF50" Foreground="White"/>
+                                    <Grid Grid.Column="3" VerticalAlignment="Center">
+                                        <Button x:Name="btnAdaugaMeniu" Content="Adaugă Meniu" Command="{Binding DataContext.AdaugaMeniuInCosCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Visibility="{Binding DataContext.EsteClient, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}" Background="#4CAF50" Foreground="White"/>
+                                        <TextBlock x:Name="txtIndisponibilMeniu" Text="INDISPONIBIL" Foreground="Red" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                    </Grid>
                                 </Grid>
                             </Border>
+
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding EsteDisponibil}" Value="False">
+                                    <Setter TargetName="btnAdaugaMeniu" Property="Visibility" Value="Collapsed" />
+                                    <Setter TargetName="txtIndisponibilMeniu" Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -15,17 +15,27 @@ namespace RestaurantApp.Core
 
                 if (kg > 0)
                 {
+                    if (g == 0) return $"{kg}kg";
+
                     return $"{kg}kg si {g}g";
                 }
+
                 return $"{g}g";
             }
+
             if (value is string strValue && int.TryParse(strValue, out int grams))
             {
                 int kg = grams / 1000;
                 int g = grams % 1000;
-                if (kg > 0) return $"{kg}kg si {g}g";
+
+                if (kg > 0)
+                {
+                    if (g == 0) return $"{kg}kg";
+                    return $"{kg}kg si {g}g";
+                }
                 return $"{g}g";
             }
+
             return value;
         }
 
