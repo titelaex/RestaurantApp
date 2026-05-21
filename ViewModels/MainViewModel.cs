@@ -248,32 +248,50 @@ namespace RestaurantApp.ViewModels
         private void RecalculeazaTotaluri()
         {
             decimal reducereMeniuX = Convert.ToDecimal(System.Configuration.ConfigurationManager.AppSettings["ReducereMeniuProcentX"] ?? "10");
-            CostMancare = CosCumparaturi.Sum(e => e.Subtotal) + CosMeniuri.Sum(m => m.Subtotal);
+            CostMancare = CosCumparaturi.Sum(e => e.Subtotal) + CosMeniuri.Sum(m => m.GetSubtotal(reducereMeniuX));
 
             try
             {
-                decimal limitaFaraTransport = Convert.ToDecimal(System.Configuration.ConfigurationManager.AppSettings["ValoareMinimaFaraTransportA"] ?? "50");
-                decimal taxaTransport = Convert.ToDecimal(System.Configuration.ConfigurationManager.AppSettings["CostTransportB"] ?? "15");
-                decimal sumaMinimaDiscount = Convert.ToDecimal(System.Configuration.ConfigurationManager.AppSettings["SumaMinimaDiscountY"] ?? "150");
                 decimal procentDiscount = Convert.ToDecimal(System.Configuration.ConfigurationManager.AppSettings["ProcentDiscountW"] ?? "15");
+                decimal limitaA = Convert.ToDecimal(System.Configuration.ConfigurationManager.AppSettings["ValoareMinimaFaraTransportA"] ?? "50");
+                decimal transportB = Convert.ToDecimal(System.Configuration.ConfigurationManager.AppSettings["CostTransportB"] ?? "15");
 
-                if (CostMancare > 0)
+                decimal sumaMinimaY = Convert.ToDecimal(System.Configuration.ConfigurationManager.AppSettings["SumaMinimaDiscountY"] ?? "150");
+                int pragZ = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["NumarComenziZ"] ?? "5");
+                int intervalT = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["IntervalTimpZileT"] ?? "30");
+                decimal procentW = Convert.ToDecimal(System.Configuration.ConfigurationManager.AppSettings["ProcentDiscountW"] ?? "15");
+
+                CostTransport = (CostMancare > 0 && CostMancare < limitaA) ? transportB : 0;
+
+                decimal discountSuma = (CostMancare > sumaMinimaY) ? (CostMancare * procentDiscount / 100) : 0;
+                decimal discountFidelitate = 0;
+
+                if (SesiuneCurenta.EsteLogat)
                 {
-                    CostTransport = (CostMancare < limitaFaraTransport) ? taxaTransport : 0;
-                    decimal reducereProcentuala = (CostMancare > sumaMinimaDiscount) ? CostMancare * (procentDiscount / 100) : 0;
-                    ValoareDiscount = reducereProcentuala;
+                    using (SqlConnection conn = new SqlConnection(_connString))
+                    {
+                        conn.Open();
+                        using (SqlCommand cmd = new SqlCommand("sp_VerificaFidelitate", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.AddWithValue("@ClientId", SesiuneCurenta.UtilizatorLogat.Id);
+                            cmd.Parameters.AddWithValue("@IntervalZile", intervalT);
+
+                            int comenziRecente = (int)cmd.ExecuteScalar();
+                            if (comenziRecente >= pragZ)
+                            {
+                                discountFidelitate = CostMancare * procentDiscount / 100;
+                            }
+                        }
+                    }
                 }
-                else
-                {
-                    CostTransport = 0;
-                    ValoareDiscount = 0;
-                }
+
+                ValoareDiscount = discountSuma + discountFidelitate;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                CostTransport = 0;
+                System.Diagnostics.Debug.WriteLine("Eroare calcul discount: " + ex.Message);
                 ValoareDiscount = 0;
-                System.Diagnostics.Debug.WriteLine("Eroare la calcul: " + ex.Message);
             }
             OnPropertyChanged(nameof(TotalDePlata));
         }
